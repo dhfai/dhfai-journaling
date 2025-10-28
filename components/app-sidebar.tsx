@@ -48,39 +48,26 @@ const data = {
       icon: IconDashboard,
     },
     {
-      title: "Notes",
-      url: "/dashboard/notes",
-      icon: IconNote,
-    },
-    {
-      title: "Tasks",
-      url: "/dashboard/tasks",
-      icon: IconChecklist,
-    },
-    {
-      title: "Todos",
-      url: "/dashboard/todos",
-      icon: IconListDetails,
-    },
-    {
-      title: "Lifecycle",
+      title: "Produktifitas",
       url: "#",
       icon: IconListDetails,
-    },
-    {
-      title: "Analytics",
-      url: "#",
-      icon: IconChartBar,
-    },
-    {
-      title: "Projects",
-      url: "#",
-      icon: IconFolder,
-    },
-    {
-      title: "Team",
-      url: "#",
-      icon: IconUsers,
+      items: [
+        {
+          title: "Notes",
+          url: "/dashboard/notes",
+          icon: IconNote,
+        },
+        {
+          title: "Tasks",
+          url: "/dashboard/tasks",
+          icon: IconChecklist,
+        },
+        {
+          title: "Todos",
+          url: "/dashboard/todos",
+          icon: IconListDetails,
+        },
+      ],
     },
   ],
   navClouds: [
@@ -132,11 +119,6 @@ const data = {
     },
   ],
   navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: IconSettings,
-    },
     {
       title: "Get Help",
       url: "#",

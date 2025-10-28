@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { User } from '@/types/api';
 import { AuthService } from '@/services/auth';
 import { ProfileService } from '@/services/profile';
+import { toast } from 'sonner';
 
 interface AuthContextType {
   user: User | null;
@@ -47,7 +48,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (response.success && response.data) {
           setUser(response.data.user);
         } else {
-          // If profile fetch fails, logout
+          // If profile fetch fails due to auth error, logout
+          console.log('Profile fetch failed, logging out');
           await logout();
         }
       }
@@ -80,8 +82,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       await AuthService.logout();
       setUser(null);
+
+      // Show logout message
+      toast.info('Logged Out', {
+        description: 'You have been logged out successfully.',
+      });
+
+      // Redirect to get-started page
+      if (typeof window !== 'undefined') {
+        setTimeout(() => {
+          window.location.href = '/get-started';
+        }, 500);
+      }
     } catch (error) {
       console.error('Logout failed:', error);
+      // Even if logout fails, clear local state
+      setUser(null);
+      if (typeof window !== 'undefined') {
+        window.location.href = '/get-started';
+      }
     }
   };
 
@@ -90,26 +109,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await AuthService.refreshToken();
 
       if (!response.success) {
-        // Only logout after multiple failed attempts
-        setRefreshAttempts(prev => prev + 1);
-
-        if (refreshAttempts >= 2) {
-          console.log('Max refresh attempts reached, logging out');
-          await logout();
-          setRefreshAttempts(0);
-        }
+        // Refresh failed - logout immediately
+        console.log('Token refresh failed, logging out');
+        await logout();
       } else {
         // Reset attempts on successful refresh
         setRefreshAttempts(0);
       }
     } catch (error) {
       console.error('Token refresh failed:', error);
-      setRefreshAttempts(prev => prev + 1);
-
-      if (refreshAttempts >= 2) {
-        await logout();
-        setRefreshAttempts(0);
-      }
+      // On error, logout immediately
+      await logout();
     }
   };
 
