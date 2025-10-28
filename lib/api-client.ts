@@ -1,5 +1,6 @@
 import { ApiResponse } from '@/types/api';
 import { CookieManager } from './cookie-manager';
+import AuthInterceptor from './auth-interceptor';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 
@@ -99,7 +100,20 @@ class ApiClient {
       const data = await response.json();
 
       if (!response.ok) {
-        if (response.status === 401 && !window.location.pathname.includes('/auth/')) {
+        // Handle 401 Unauthorized - Token expired
+        if (response.status === 401) {
+          // Show toast notification
+          AuthInterceptor.handleTokenExpired();
+
+          // Clear all auth data
+          this.clearAuthData();
+
+          // Redirect to login if not already there
+          if (typeof window !== 'undefined' && !window.location.pathname.includes('/get-started')) {
+            setTimeout(() => {
+              window.location.href = '/get-started';
+            }, 500); // Small delay to show toast
+          }
         }
 
         return {
@@ -122,6 +136,18 @@ class ApiClient {
         success: false,
         error: 'Failed to parse response',
       };
+    }
+  }
+
+  private clearAuthData(): void {
+    // Clear cookies
+    CookieManager.remove('access_token');
+    CookieManager.remove('refresh_token');
+
+    // Clear localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
     }
   }
 
@@ -165,6 +191,16 @@ class ApiClient {
         if (refreshSuccess) {
           // Retry the request with new token
           return this.makeRequest<T>(method, endpoint, body, requireAuth, true);
+        } else {
+          // Refresh failed, show notification, clear auth and redirect
+          AuthInterceptor.handleTokenExpired();
+          this.clearAuthData();
+
+          if (typeof window !== 'undefined' && !window.location.pathname.includes('/get-started')) {
+            setTimeout(() => {
+              window.location.href = '/get-started';
+            }, 500);
+          }
         }
       }
 

@@ -1,63 +1,132 @@
-import Image from "next/image";
+"use client"
+
+import { motion } from "framer-motion"
+import Link from "next/link"
+import { ArrowRight, BookOpen, CheckCircle, Sparkles } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="relative min-h-screen overflow-hidden bg-white dark:bg-[#1a1d2e]">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <motion.div
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.05, 0.1, 0.05],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute -top-1/2 -left-1/2 h-[800px] w-[800px] rounded-full bg-[#4E5173] blur-3xl"
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        <motion.div
+          animate={{
+            scale: [1.2, 1, 1.2],
+            opacity: [0.05, 0.1, 0.05],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute -bottom-1/2 -right-1/2 h-[800px] w-[800px] rounded-full bg-[#4E5173] blur-3xl"
+        />
+      </div>
+
+      <main className="relative flex min-h-screen flex-col items-center justify-center px-6 py-12 sm:px-8 lg:px-12">
+        <div className="mx-auto max-w-5xl text-center">
+          {/* Logo/Brand */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="mb-8 inline-flex items-center gap-2 rounded-full bg-white/80 px-6 py-3 shadow-lg backdrop-blur-sm dark:bg-[#4E5173]/40"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            <BookOpen className="h-6 w-6 text-[#4E5173] dark:text-white" />
+            <span className="text-xl font-bold text-[#4E5173] dark:text-white">DHFAI Journal</span>
+          </motion.div>
+
+          {/* Hero heading */}
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="mb-6 text-5xl font-bold tracking-tight text-[#2a2d3e] dark:text-white sm:text-6xl lg:text-7xl"
           >
-            Documentation
-          </a>
+            Your Digital Journal,{" "}
+            <span className="text-[#4E5173] dark:text-[#7a7ea8]">
+              Reimagined
+            </span>
+          </motion.h1>
+
+          {/* Description */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="mx-auto mb-12 max-w-2xl text-lg text-gray-600 dark:text-gray-300 sm:text-xl"
+          >
+            Organize your thoughts, track your tasks, and capture your ideas in a beautiful,
+            intuitive journaling experience designed for the modern age.
+          </motion.p>
+
+          {/* CTA Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="mb-16 flex flex-col gap-4 sm:flex-row sm:justify-center"
+          >
+            <Button
+              asChild
+              size="lg"
+              className="group bg-[#4E5173] text-white hover:bg-[#3d4160] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+            >
+              <Link href="/get-started">
+                Get Started Free
+                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="border-2 border-[#4E5173] text-[#4E5173] hover:bg-[#4E5173] hover:text-white dark:border-[#7a7ea8] dark:text-[#7a7ea8] dark:hover:bg-[#4E5173] shadow-md hover:shadow-lg transition-all duration-300"
+            >
+              <Link href="/dashboard">
+                View Dashboard
+              </Link>
+            </Button>
+          </motion.div>
+
+          {/* Features */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="grid gap-6 sm:grid-cols-3"
+          >
+            {[
+              { icon: BookOpen, title: "Rich Notes", desc: "Write with powerful editor" },
+              { icon: CheckCircle, title: "Task Management", desc: "Stay organized effortlessly" },
+              { icon: Sparkles, title: "Beautiful UI", desc: "Elegant and intuitive design" },
+            ].map((feature, index) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.5 + index * 0.1 }}
+                className="group rounded-2xl bg-white/80 p-6 backdrop-blur-sm transition-all duration-300 hover:bg-white hover:shadow-xl dark:bg-[#4E5173]/20 dark:hover:bg-[#4E5173]/30"
+              >
+                <feature.icon className="mx-auto mb-4 h-12 w-12 text-[#4E5173] dark:text-white transition-transform duration-300 group-hover:scale-110" />
+                <h3 className="mb-2 text-xl font-semibold text-[#2a2d3e] dark:text-white">{feature.title}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300">{feature.desc}</p>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
       </main>
     </div>
