@@ -69,7 +69,7 @@ export default function GetStartedPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#525e6f] overflow-x-hidden">
+        <div className="min-h-screen bg-[#4E5173] overflow-x-hidden">
             {/* Full Container with Smooth Transitions */}
             <div className="min-h-screen flex flex-col md:flex-row transition-all duration-700 ease-in-out">
 
@@ -78,7 +78,7 @@ export default function GetStartedPage() {
                     className={`flex items-center justify-center p-6 md:p-8 transition-all duration-700 ease-in-out ${
                         currentView === "welcome"
                             ? "w-full min-h-screen"
-                            : "md:w-1/2 w-full bg-[#5d6a7d] min-h-[40vh] md:min-h-screen"
+                            : "md:w-1/2 w-full bg-[#5a5e87]/50 backdrop-blur-sm min-h-[40vh] md:min-h-screen"
                     }`}
                 >
                     <div className={`flex flex-col items-center justify-center text-center transition-all duration-700 w-full ${
@@ -135,7 +135,7 @@ export default function GetStartedPage() {
                                 size="lg"
                                 onClick={handleRegisterClick}
                                 disabled={animatingButton !== null}
-                                className={`bg-[#636e7e] text-white hover:bg-[#4a5568] font-semibold px-8 sm:px-10 md:px-12 py-5 md:py-6 text-base md:text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 border border-gray-600 w-full sm:w-auto ${
+                                className={`bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm font-semibold px-8 sm:px-10 md:px-12 py-5 md:py-6 text-base md:text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 border border-white/30 w-full sm:w-auto ${
                                     animatingButton === "register" ? "invisible" : ""
                                 }`}
                             >
@@ -147,7 +147,7 @@ export default function GetStartedPage() {
 
                 {/* Right Side - Forms (Slides in from Right on Desktop, Below Illustration on Mobile) */}
                 <div
-                    className={`flex items-center justify-center p-6 md:p-8 bg-[#3d4654] transition-all duration-700 ease-in-out ${
+                    className={`flex items-center justify-center p-6 md:p-8 bg-[#3d4160]/60 backdrop-blur-md transition-all duration-700 ease-in-out ${
                         currentView === "welcome"
                             ? "w-0 opacity-0 overflow-hidden hidden"
                             : "w-full md:w-1/2 opacity-100 min-h-[60vh] md:min-h-screen"
@@ -182,7 +182,7 @@ export default function GetStartedPage() {
                     className={`fixed font-semibold text-lg rounded-full shadow-lg transition-none z-50 pointer-events-none hidden md:block ${
                         animatingButton === "login"
                             ? "bg-white text-gray-800"
-                            : "bg-[#636e7e] text-white border border-gray-600"
+                            : "bg-white/10 text-white border border-white/30 backdrop-blur-sm"
                     }`}
                     style={{
                         top: `${buttonPosition.top}px`,
