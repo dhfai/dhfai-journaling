@@ -98,6 +98,111 @@ export interface ProfileResponse {
   profile: Profile;
 }
 
+export interface TodoItemInBlock {
+  id: string;
+  text: string;
+  done: boolean;
+}
+
+export interface Block {
+  id: string;
+  type: 'paragraph' | 'heading' | 'todo';
+  order: number;
+  content_md?: string;
+  items?: TodoItemInBlock[];
+}
+
+export interface Note {
+  id: string;
+  user_id: string;
+  title: string;
+  blocks: Block[];
+  tags: string[];
+  is_pinned: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateNoteRequest {
+  title: string;
+  tags?: string[];
+}
+
+export interface UpdateNoteRequest {
+  title?: string;
+  tags?: string[];
+  is_pinned?: boolean;
+}
+
+export interface CreateBlockRequest {
+  type: 'paragraph' | 'heading' | 'todo';
+  content_md?: string;
+  items?: TodoItemInBlock[];
+}
+
+export interface UpdateBlockRequest {
+  content_md?: string;
+  items?: TodoItemInBlock[];
+}
+
+export interface ReorderBlocksRequest {
+  order: string[];
+}
+
+export interface Todo {
+  id: string;
+  user_id: string;
+  title: string;
+  done: boolean;
+  priority: 'low' | 'medium' | 'high';
+  due_date?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateTodoRequest {
+  title: string;
+  priority?: 'low' | 'medium' | 'high';
+  due_date?: string;
+}
+
+export interface UpdateTodoRequest {
+  title?: string;
+  done?: boolean;
+  priority?: 'low' | 'medium' | 'high';
+  due_date?: string | null;
+}
+
+export interface Task {
+  id: string;
+  user_id: string;
+  title: string;
+  description_md?: string;
+  status: 'todo' | 'in_progress' | 'done';
+  priority: 'low' | 'medium' | 'high';
+  deadline?: string;
+  tags: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateTaskRequest {
+  title: string;
+  description_md?: string;
+  priority?: 'low' | 'medium' | 'high';
+  deadline?: string;
+  tags?: string[];
+}
+
+export interface UpdateTaskRequest {
+  title?: string;
+  description_md?: string;
+  status?: 'todo' | 'in_progress' | 'done';
+  priority?: 'low' | 'medium' | 'high';
+  deadline?: string | null;
+  tags?: string[];
+}
+
 // Error types for better error handling
 export interface ApiError {
   success: false;
