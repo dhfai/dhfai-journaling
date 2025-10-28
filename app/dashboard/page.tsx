@@ -1,8 +1,8 @@
 import { ChartAreaInteractive } from "@/components/chart-area-interactive"
 import { DataTable } from "@/components/data-table"
 import { SectionCards } from "@/components/section-cards"
-import { ProtectedRoute } from "@/components/protected-route"
-import { PageTransition } from "@/components/page-transition"
+import { ProtectedRoute } from "@/components/utils/protected-route"
+import { PageTransition } from "@/components/utils/page-transition"
 
 import data from "./data.json"
 
