@@ -120,3 +120,56 @@
     @apply bg-background text-foreground;
   }
 }
+
+.prose {
+  @apply text-foreground;
+}
+
+.prose h1 {
+  @apply text-2xl font-bold mb-2;
+}
+
+.prose h2 {
+  @apply text-xl font-bold mb-2;
+}
+
+.prose h3 {
+  @apply text-lg font-bold mb-2;
+}
+
+.prose p {
+  @apply mb-2;
+}
+
+.prose a {
+  @apply text-primary underline;
+}
+
+.prose ul,
+.prose ol {
+  @apply ml-4 mb-2;
+}
+
+.prose li {
+  @apply mb-1;
+}
+
+.prose code {
+  @apply bg-muted px-1 py-0.5 rounded text-sm;
+}
+
+.prose pre {
+  @apply bg-muted p-4 rounded mb-2 overflow-x-auto;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-primary pl-4 italic;
+}
+
+.prose strong {
+  @apply font-bold;
+}
+
+.prose em {
+  @apply italic;
+}
