@@ -13,10 +13,12 @@ import {
   IconHelp,
   IconInnerShadowTop,
   IconListDetails,
+  IconNote,
   IconReport,
   IconSearch,
   IconSettings,
   IconUsers,
+  IconChecklist,
 } from "@tabler/icons-react"
 
 import { NavDocuments } from "@/components/nav-documents"
@@ -42,8 +44,23 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "#",
+      url: "/dashboard",
       icon: IconDashboard,
+    },
+    {
+      title: "Notes",
+      url: "/dashboard/notes",
+      icon: IconNote,
+    },
+    {
+      title: "Tasks",
+      url: "/dashboard/tasks",
+      icon: IconChecklist,
+    },
+    {
+      title: "Todos",
+      url: "/dashboard/todos",
+      icon: IconListDetails,
     },
     {
       title: "Lifecycle",
@@ -158,11 +175,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
+              className="data-[slot=sidebar-menu-button]:p-1.5!"
             >
               <a href="#">
-                <IconInnerShadowTop className="!size-5" />
-                <span className="text-base font-semibold">Acme Inc.</span>
+                <IconInnerShadowTop className="size-5!" />
+                <span className="text-base font-semibold">dhf.ai</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>

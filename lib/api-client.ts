@@ -99,10 +99,7 @@ class ApiClient {
       const data = await response.json();
 
       if (!response.ok) {
-        // Don't treat auth failures as errors for refresh endpoint
         if (response.status === 401 && !window.location.pathname.includes('/auth/')) {
-          // Token might be expired, but don't force logout here
-          // Let the auth service handle this
         }
 
         return {
@@ -112,7 +109,14 @@ class ApiClient {
         };
       }
 
-      return data;
+      if (data && typeof data === 'object' && 'success' in data) {
+        return data;
+      }
+
+      return {
+        success: true,
+        data: data as T,
+      };
     } catch (error) {
       return {
         success: false,
@@ -131,6 +135,10 @@ class ApiClient {
 
   async put<T>(endpoint: string, body?: any, requireAuth: boolean = false): Promise<ApiResponse<T>> {
     return this.makeRequest<T>('PUT', endpoint, body, requireAuth);
+  }
+
+  async patch<T>(endpoint: string, body?: any, requireAuth: boolean = false): Promise<ApiResponse<T>> {
+    return this.makeRequest<T>('PATCH', endpoint, body, requireAuth);
   }
 
   async delete<T>(endpoint: string, requireAuth: boolean = false): Promise<ApiResponse<T>> {
