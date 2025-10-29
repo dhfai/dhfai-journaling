@@ -26,6 +26,7 @@ import {
   closestCenter,
   KeyboardSensor,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   DragEndEvent,
@@ -63,7 +64,17 @@ export function NoteEditor({ noteId }: NoteEditorProps) {
   const [viewMode, setViewMode] = useState<'editor' | 'preview'>('editor');
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Jarak minimal untuk mulai drag (prevent accidental drags)
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200, // Delay 200ms untuk touch (mencegah scroll)
+        tolerance: 5, // Toleransi gerakan 5px
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })

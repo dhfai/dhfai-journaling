@@ -13,6 +13,7 @@ function ThemeSyncWrapper({ children }: { children: React.ReactNode }) {
 
   React.useEffect(() => {
     // Only sync theme on initial load, not on subsequent updates
+    // useProfile hook now handles authentication check internally
     if (!isLoading && profile?.theme && !hasInitialized.current) {
       const userTheme = profile.theme.toLowerCase()
 

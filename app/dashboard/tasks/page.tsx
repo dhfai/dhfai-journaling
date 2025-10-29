@@ -40,7 +40,7 @@ export default function TasksPage() {
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
   const [mobileTab, setMobileTab] = useState<'todo' | 'in_progress' | 'done'>('todo');
 
-  // Form state for editing
+
   const [editForm, setEditForm] = useState({
     title: '',
     description_md: '',
@@ -51,10 +51,25 @@ export default function TasksPage() {
   });
   const [tagInput, setTagInput] = useState('');
 
-  // Get today's date in YYYY-MM-DD format for default deadline
+
   const getTodayDate = () => {
     const today = new Date();
     return today.toISOString().split('T')[0];
+  };
+
+
+  const convertToISODate = (dateString: string): string => {
+    if (!dateString) return new Date().toISOString();
+
+    const date = new Date(dateString + 'T00:00:00');
+    return date.toISOString();
+  };
+
+
+  const convertFromISODate = (isoString: string): string => {
+    if (!isoString) return getTodayDate();
+    const date = new Date(isoString);
+    return date.toISOString().split('T')[0];
   };
 
   const filteredTasks = tasks?.filter((task) => {
@@ -78,7 +93,7 @@ export default function TasksPage() {
     try {
       await createTask({
         title: newTaskTitle.trim(),
-        deadline: getTodayDate(), // Default to today
+        deadline: convertToISODate(getTodayDate()),
       });
       setNewTaskTitle('');
     } finally {
@@ -93,7 +108,7 @@ export default function TasksPage() {
       description_md: task.description_md || '',
       status: task.status,
       priority: task.priority,
-      deadline: task.deadline || getTodayDate(),
+      deadline: convertFromISODate(task.deadline || ''),
       tags: task.tags || [],
     });
     setIsDrawerOpen(true);
@@ -103,7 +118,12 @@ export default function TasksPage() {
     if (!selectedTask) return;
 
     try {
-      await updateTask(selectedTask.id, editForm);
+
+      const updateData = {
+        ...editForm,
+        deadline: convertToISODate(editForm.deadline),
+      };
+      await updateTask(selectedTask.id, updateData);
       setIsDrawerOpen(false);
       setSelectedTask(null);
     } catch (error) {
