@@ -21,10 +21,8 @@ export function formatSelection(
   const beforeText = content.substring(0, selectionStart);
   const afterText = content.substring(selectionEnd);
 
-  // Check if the selected text is already wrapped with the syntax
   const isAlreadyWrapped = isWrapped(selectedText, syntax);
 
-  // If already wrapped, unwrap it
   if (isAlreadyWrapped) {
     const unwrapped = unwrapText(selectedText, syntax);
     const unwrappedContent = beforeText + unwrapped + afterText;
@@ -35,7 +33,6 @@ export function formatSelection(
     };
   }
 
-  // Otherwise, wrap the text
   let wrappedText: string;
   let syntaxLength: number;
 
@@ -45,12 +42,10 @@ export function formatSelection(
       syntaxLength = 2;
       break;
     case 'italic':
-      // Use underscore to avoid conflict with bold
       wrappedText = `_${selectedText}_`;
       syntaxLength = 1;
       break;
     case 'underline':
-      // Use HTML tag for underline (supported by react-markdown with rehype-raw)
       wrappedText = `<u>${selectedText}</u>`;
       syntaxLength = 3;
       break;
@@ -69,8 +64,6 @@ export function formatSelection(
 
   const newContent = beforeText + wrappedText + afterText;
 
-  // After wrapping, select the entire wrapped text INCLUDING the syntax markers
-  // This allows the next click to properly detect and unwrap
   return {
     newContent,
     newSelectionStart: selectionStart,
@@ -129,35 +122,21 @@ export function getSelectionPosition(
   const { selectionStart, selectionEnd } = textarea;
 
   if (selectionStart === selectionEnd) {
-    return null; // No selection
+    return null;
   }
 
-  // Create a temporary span to measure selection position
-  const span = document.createElement('span');
-  const text = textarea.value.substring(0, selectionStart);
-  const textNode = document.createTextNode(text);
-  span.appendChild(textNode);
-
-  // Copy styles from textarea
-  const computed = window.getComputedStyle(textarea);
-  span.style.font = computed.font;
-  span.style.padding = computed.padding;
-  span.style.border = computed.border;
-  span.style.whiteSpace = 'pre-wrap';
-  span.style.wordWrap = 'break-word';
-  span.style.position = 'absolute';
-  span.style.visibility = 'hidden';
-  span.style.width = textarea.offsetWidth + 'px';
-
-  document.body.appendChild(span);
-
   const rect = textarea.getBoundingClientRect();
-  const spanRect = span.getBoundingClientRect();
 
-  document.body.removeChild(span);
+  const computedStyle = window.getComputedStyle(textarea);
+  const lineHeight = parseInt(computedStyle.lineHeight) || parseInt(computedStyle.fontSize) * 1.5;
 
-  // Calculate position
-  const top = rect.top + window.scrollY;
+  const textBeforeSelection = textarea.value.substring(0, selectionEnd);
+  const lines = textBeforeSelection.split('\n');
+  const currentLine = lines.length;
+
+
+  const isMobile = window.innerWidth < 768;
+  const top = rect.bottom + window.scrollY + (isMobile ? 8 : 0);
   const left = rect.left + window.scrollX + (rect.width / 2);
 
   return { top, left };

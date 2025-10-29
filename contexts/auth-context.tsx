@@ -48,15 +48,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (response.success && response.data) {
           setUser(response.data.user);
         } else {
-          // If profile fetch fails due to auth error, logout
-          console.log('Profile fetch failed, logging out');
-          await logout();
+          // If profile fetch fails due to auth error, clear user state but don't force logout
+          console.log('Profile fetch failed, clearing user state');
+          setUser(null);
         }
+      } else {
+        // User is not authenticated, just set user to null without redirect
+        setUser(null);
       }
     } catch (error) {
       console.error('Auth check failed:', error);
-      // If there's an error, clear the auth state
-      await logout();
+      // If there's an error, clear the auth state without redirect
+      setUser(null);
     } finally {
       setIsLoading(false);
     }
@@ -88,18 +91,30 @@ export function AuthProvider({ children }: AuthProviderProps) {
         description: 'You have been logged out successfully.',
       });
 
-      // Redirect to get-started page
+      // Only redirect if currently on a protected route (dashboard)
       if (typeof window !== 'undefined') {
-        setTimeout(() => {
-          window.location.href = '/get-started';
-        }, 500);
+        const currentPath = window.location.pathname;
+        const isOnProtectedRoute = currentPath.startsWith('/dashboard');
+
+        if (isOnProtectedRoute) {
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 500);
+        }
       }
     } catch (error) {
       console.error('Logout failed:', error);
       // Even if logout fails, clear local state
       setUser(null);
+
+      // Only redirect if on protected route
       if (typeof window !== 'undefined') {
-        window.location.href = '/get-started';
+        const currentPath = window.location.pathname;
+        const isOnProtectedRoute = currentPath.startsWith('/dashboard');
+
+        if (isOnProtectedRoute) {
+          window.location.href = '/';
+        }
       }
     }
   };

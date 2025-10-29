@@ -14,6 +14,7 @@ import {
   closestCenter,
   KeyboardSensor,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   DragEndEvent,
@@ -189,7 +190,17 @@ export function BlockEditor({ block, onUpdate, onDelete, onAddBlockBelow, dragHa
   };
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 5,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -199,7 +210,7 @@ export function BlockEditor({ block, onUpdate, onDelete, onAddBlockBelow, dragHa
     <div className="group flex gap-2 py-2">
       <div
         {...dragHandleProps}
-        className="flex items-start pt-2 cursor-grab active:cursor-grabbing opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+        className="flex items-start pt-2 cursor-grab active:cursor-grabbing opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity touch-none"
       >
         <GripVertical className="w-4 h-4 text-muted-foreground" />
       </div>
@@ -338,7 +349,7 @@ function SortableTodoItem({ item, onToggle, onTextChange, onBlur, onDelete }: So
     >
       <div
         {...listeners}
-        className="cursor-grab active:cursor-grabbing opacity-0 group-hover/item:opacity-100 transition-opacity"
+        className="cursor-grab active:cursor-grabbing opacity-100 md:opacity-0 md:group-hover/item:opacity-100 transition-opacity touch-none"
       >
         <GripVertical className="w-3 h-3 text-muted-foreground" />
       </div>

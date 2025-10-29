@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import { ProfileService } from "@/services/profile"
 import { Profile, ProfileUpdateRequest } from "@/types/api"
 import { toast } from "sonner"
+import { CookieManager } from "@/lib/cookie-manager"
 
 interface UseProfileReturn {
   profile: Profile | null
@@ -22,6 +23,16 @@ export function useProfile(): UseProfileReturn {
   const [error, setError] = useState<string | null>(null)
 
   const fetchProfile = useCallback(async () => {
+    // Check if user is authenticated before fetching profile
+    const accessToken = CookieManager.get('access_token')
+    const refreshToken = CookieManager.get('refresh_token')
+
+    if (!accessToken && !refreshToken) {
+      // User not authenticated, skip fetch
+      setIsLoading(false)
+      return
+    }
+
     try {
       setIsLoading(true)
       setError(null)
@@ -36,7 +47,10 @@ export function useProfile(): UseProfileReturn {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred"
       setError(errorMessage)
-      console.error("Failed to fetch profile:", err)
+      // Don't log error to console if it's just "Missing authorization header"
+      if (!errorMessage.includes("Missing authorization header")) {
+        console.error("Failed to fetch profile:", err)
+      }
     } finally {
       setIsLoading(false)
     }

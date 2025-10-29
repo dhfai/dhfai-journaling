@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DHFAI Journaling - Your Digital Journal",
+  title: "dhfai-Journaling - Your Digital Journal",
   description: "Modern journaling app for organizing your thoughts, tasks, and notes",
 };
 
