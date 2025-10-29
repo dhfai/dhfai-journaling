@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, KeyboardEvent } from 'react';
+import { useState, useRef, useEffect, useCallback, KeyboardEvent } from 'react';
 import { Block, TodoItemInBlock } from '@/types/api';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -46,12 +46,29 @@ export function BlockEditor({ block, onUpdate, onDelete, onAddBlockBelow, dragHa
   const [isFormatting, setIsFormatting] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Auto-resize textarea based on content
+  const adjustTextareaHeight = useCallback(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      // Reset height to auto to get the correct scrollHeight
+      textarea.style.height = 'auto';
+      // Set height to scrollHeight to show all content
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  }, []);
+
   useEffect(() => {
     if (isEditing && textareaRef.current) {
       textareaRef.current.focus();
       textareaRef.current.setSelectionRange(content.length, content.length);
+      adjustTextareaHeight();
     }
-  }, [isEditing]);
+  }, [isEditing, adjustTextareaHeight]);
+
+  // Adjust height when content changes
+  useEffect(() => {
+    adjustTextareaHeight();
+  }, [content, adjustTextareaHeight]);
 
   // Handle text selection to show toolbar
   const handleSelectionChange = () => {
@@ -215,7 +232,7 @@ export function BlockEditor({ block, onUpdate, onDelete, onAddBlockBelow, dragHa
         <GripVertical className="w-4 h-4 text-muted-foreground" />
       </div>
 
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 wrap-break-word">
         {block.type === 'todo' ? (
           <div className="space-y-1">
             <DndContext
@@ -261,11 +278,14 @@ export function BlockEditor({ block, onUpdate, onDelete, onAddBlockBelow, dragHa
                   onBlur={handleBlur}
                   onKeyDown={handleKeyDown}
                   placeholder={block.type === 'heading' ? 'Heading' : 'Type something...'}
-                  className={`w-full bg-transparent border-none outline-none resize-none ${
+                  className={`w-full bg-transparent border-none outline-none resize-none overflow-hidden wrap-break-word whitespace-pre-wrap ${
                     block.type === 'heading' ? 'text-2xl font-bold' : 'text-base'
                   }`}
-                  rows={1}
-                  style={{ minHeight: '1.5em' }}
+                  style={{
+                    minHeight: '1.5em',
+                    height: 'auto',
+                    wordWrap: 'break-word'
+                  }}
                 />
                 <FloatingToolbar
                   position={toolbarPosition}
@@ -275,12 +295,12 @@ export function BlockEditor({ block, onUpdate, onDelete, onAddBlockBelow, dragHa
             ) : (
               <div
                 onClick={() => setIsEditing(true)}
-                className={`cursor-text min-h-[1.5em] ${
+                className={`cursor-text min-h-[1.5em] wrap-break-word ${
                   !content && 'text-muted-foreground'
                 }`}
               >
                 {content ? (
-                  <div className={`prose prose-sm dark:prose-invert max-w-none ${
+                  <div className={`prose prose-sm dark:prose-invert max-w-none wrap-break-word ${
                     block.type === 'heading' ? 'text-2xl font-bold' : ''
                   }`}>
                     <ReactMarkdown
