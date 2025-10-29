@@ -45,7 +45,7 @@ export function FloatingToolbar({ onFormat, position }: FloatingToolbarProps) {
         style={{
           top: `${position.top}px`,
           left: `${position.left}px`,
-          transform: 'translate(-50%, -120%)',
+          transform: 'translate(-50%, 0)',
         }}
         onMouseDown={(e) => e.preventDefault()} // Prevent blur on textarea
       >
