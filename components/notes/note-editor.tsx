@@ -171,9 +171,9 @@ export function NoteEditor({ noteId }: NoteEditorProps) {
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      {/* Header */}
-      <div className="border-b px-6 py-4 bg-background">
-        <div className="flex items-center justify-between mb-3">
+      {/* Header - Sticky/Fixed */}
+      <div className="shrink-0 border-b px-4 py-3 bg-background md:px-6">
+        <div className="flex items-center justify-between gap-4 mb-2">
           {isEditingTitle ? (
             <Input
               value={title}
@@ -182,36 +182,36 @@ export function NoteEditor({ noteId }: NoteEditorProps) {
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleTitleBlur();
               }}
-              className="text-2xl font-semibold border-none shadow-none focus-visible:ring-0 px-0"
+              className="text-xl md:text-2xl font-semibold border-none shadow-none focus-visible:ring-0 px-0 h-auto"
               autoFocus
             />
           ) : (
             <h1
-              className="text-2xl font-semibold cursor-pointer hover:text-primary"
+              className="text-xl md:text-2xl font-semibold cursor-pointer hover:text-primary line-clamp-1"
               onClick={() => setIsEditingTitle(true)}
             >
               {currentNote.title}
             </h1>
           )}
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 shrink-0">
             {/* Editor/Preview Toggle */}
             <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as 'editor' | 'preview')}>
-              <TabsList>
-                <TabsTrigger value="editor" className="gap-1">
+              <TabsList className="h-8">
+                <TabsTrigger value="editor" className="gap-1 px-2 text-sm h-7">
                   <Edit3 className="w-3 h-3" />
-                  Editor
+                  <span className="hidden sm:inline">Editor</span>
                 </TabsTrigger>
-                <TabsTrigger value="preview" className="gap-1">
+                <TabsTrigger value="preview" className="gap-1 px-2 text-sm h-7">
                   <Eye className="w-3 h-3" />
-                  Preview
+                  <span className="hidden sm:inline">Preview</span>
                 </TabsTrigger>
               </TabsList>
             </Tabs>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className="h-8 w-8">
                   <MoreHorizontal className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -226,15 +226,15 @@ export function NoteEditor({ noteId }: NoteEditorProps) {
         </div>
 
         {/* Tags */}
-        <div className="flex flex-wrap gap-2 items-center">
+        <div className="flex flex-wrap gap-1.5 items-center">
           {currentNote.tags.map((tag, index) => (
-            <Badge key={index} variant="secondary" className="gap-1">
+            <Badge key={index} variant="secondary" className="gap-1 text-xs py-0 px-2 h-6">
               {tag}
               <button
                 onClick={() => handleRemoveTag(tag)}
                 className="ml-1 hover:text-destructive"
               >
-                <X className="w-3 h-3" />
+                <X className="w-2.5 h-2.5" />
               </button>
             </Badge>
           ))}
@@ -270,8 +270,8 @@ export function NoteEditor({ noteId }: NoteEditorProps) {
         </div>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-auto p-6">
+      {/* Content - Scrollable Area */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden p-6">
         {viewMode === 'editor' ? (
           <>
             <DndContext

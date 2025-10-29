@@ -155,14 +155,14 @@ export default function NotesPage() {
     <div
       onClick={() => handleSelectNote(note)}
       className={cn(
-        "p-3 rounded-lg cursor-pointer border transition-all hover:border-primary/30",
+        "p-3 rounded-lg cursor-pointer border transition-all",
         isSelected
-          ? "bg-primary/10 border-primary/50"
-          : "bg-card border-transparent hover:bg-accent"
+          ? "bg-primary/10 border-primary/50 shadow-sm"
+          : "bg-card border-border hover:border-primary/30 hover:bg-accent/50 active:bg-accent"
       )}
     >
       <div className="flex items-start justify-between gap-2 mb-2">
-        <h3 className="font-medium text-sm line-clamp-1 flex-1">{note.title}</h3>
+        <h3 className="font-medium text-sm line-clamp-1 flex-1 text-foreground">{note.title}</h3>
         <div className="flex items-center gap-1">
           {note.is_pinned && (
             <Pin className="h-3 w-3 text-primary fill-primary" />
@@ -218,7 +218,8 @@ export default function NotesPage() {
   );
 
   return (
-    <div className="flex h-screen bg-background relative">
+    <div className="flex h-screen bg-background relative overflow-hidden">
+      {/* Notes Sidebar - Fixed dengan scroll area sendiri */}
       <div
         ref={sidebarRef}
         style={{
@@ -226,31 +227,34 @@ export default function NotesPage() {
           minWidth: isSidebarOpen ? `${sidebarWidth}px` : '0px'
         }}
         className={cn(
-          "shrink-0 border-r bg-sidebar transition-all duration-300 ease-in-out overflow-hidden",
+          "shrink-0 border-r bg-background transition-all duration-300 ease-in-out overflow-hidden flex flex-col",
           "md:relative fixed inset-y-0 left-0 z-40 md:z-0",
           !isSidebarOpen && "border-r-0",
           isSidebarOpen && "shadow-lg md:shadow-none"
         )}
       >
-        <div className="flex flex-col h-full p-4" style={{ width: sidebarWidth }}>
+        {/* Sidebar Header - Fixed */}
+        <div className="shrink-0 p-4 border-b bg-background" style={{ width: sidebarWidth }}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              <h1 className="text-xl font-semibold">Notes</h1>
+              <FileText className="h-5 w-5 text-foreground" />
+              <h1 className="text-xl font-semibold text-foreground">Notes</h1>
             </div>
             <div className="flex items-center gap-2">
+              {/* Create button - hidden on mobile, will use FAB instead */}
               <Button
                 onClick={handleCreateNote}
                 size="icon"
                 disabled={isCreating}
-                className="h-8 w-8"
+                className="h-8 w-8 hidden md:flex"
               >
                 <Plus className="h-4 w-4" />
               </Button>
+              {/* Close button - only on mobile */}
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8"
+                className="h-8 w-8 md:hidden"
                 onClick={() => setIsSidebarOpen(false)}
               >
                 <PanelLeftClose className="h-4 w-4" />
@@ -258,17 +262,22 @@ export default function NotesPage() {
             </div>
           </div>
 
-          <div className="relative mb-4">
+          <div className="relative" onClick={(e) => e.stopPropagation()}>
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search notes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
               className="pl-9"
             />
           </div>
+        </div>
 
-          <ScrollArea className="flex-1">
+        {/* Sidebar Content - Scrollable */}
+        <div className="flex-1 overflow-hidden bg-background" style={{ width: sidebarWidth }}>
+          <ScrollArea className="h-full px-4 py-4">
             {isLoading ? (
               <div className="space-y-2">
                 {[...Array(5)].map((_, i) => (
@@ -290,11 +299,11 @@ export default function NotesPage() {
                 </p>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {pinnedNotes.length > 0 && (
                   <div>
-                    <h2 className="text-xs font-semibold text-muted-foreground mb-2 px-1">
-                      PINNED
+                    <h2 className="text-xs font-semibold text-muted-foreground mb-3 px-1 uppercase tracking-wide">
+                      Pinned
                     </h2>
                     <div className="space-y-2">
                       {pinnedNotes.map((note) => (
@@ -311,8 +320,8 @@ export default function NotesPage() {
                 {unpinnedNotes.length > 0 && (
                   <div>
                     {pinnedNotes.length > 0 && (
-                      <h2 className="text-xs font-semibold text-muted-foreground mb-2 px-1">
-                        NOTES
+                      <h2 className="text-xs font-semibold text-muted-foreground mb-3 px-1 uppercase tracking-wide">
+                        Notes
                       </h2>
                     )}
                     <div className="space-y-2">
@@ -331,6 +340,7 @@ export default function NotesPage() {
           </ScrollArea>
         </div>
 
+        {/* Resize Handle */}
         <div
           onMouseDown={startResizing}
           className={cn(
@@ -340,6 +350,18 @@ export default function NotesPage() {
         >
           <div className="absolute top-1/2 -translate-y-1/2 right-0 w-1 h-12 bg-border group-hover:bg-primary transition-colors" />
         </div>
+
+        {/* Floating Action Button - Mobile Only */}
+        {isSidebarOpen && (
+          <Button
+            onClick={handleCreateNote}
+            disabled={isCreating}
+            size="icon"
+            className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg md:hidden z-50"
+          >
+            <Plus className="h-6 w-6" />
+          </Button>
+        )}
       </div>
 
       {isSidebarOpen && (
@@ -349,15 +371,16 @@ export default function NotesPage() {
         />
       )}
 
-      <div className="flex-1 overflow-hidden relative">
+      {/* Main Editor Area - flex column dengan overflow hidden */}
+      <div className="flex-1 flex flex-col overflow-hidden relative">
         {!isSidebarOpen && (
           <Button
             variant="ghost"
             size="icon"
-            className="fixed md:absolute left-0 top-1/2 -translate-y-1/2 z-60 h-12 w-8 rounded-l-none rounded-r-lg bg-sidebar hover:bg-sidebar/90 border border-l-0 shadow-lg"
+            className="fixed md:absolute left-0 top-1/2 -translate-y-1/2 z-60 h-12 w-8 rounded-l-none rounded-r-lg bg-background hover:bg-accent border border-l-0 shadow-lg"
             onClick={() => setIsSidebarOpen(true)}
           >
-            <ChevronRight className="h-5 w-5" />
+            <ChevronRight className="h-5 w-5 text-foreground" />
           </Button>
         )}
 
