@@ -123,14 +123,6 @@ export function NavUser() {
                 Account
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <IconCreditCard className="mr-2 h-4 w-4" />
-              Billing
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <IconNotification className="mr-2 h-4 w-4" />
-              Notifications
-            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={handleLogout}
