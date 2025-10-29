@@ -9,6 +9,11 @@ export function middleware(request: NextRequest) {
   const accessToken = request.cookies.get('access_token')?.value;
   const refreshToken = request.cookies.get('refresh_token')?.value;
 
+  // Skip middleware for root path
+  if (pathname === '/') {
+    return NextResponse.next();
+  }
+
   const isProtectedRoute = protectedRoutes.some(route =>
     pathname.startsWith(route)
   );

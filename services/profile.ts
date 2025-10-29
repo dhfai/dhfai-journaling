@@ -15,16 +15,21 @@ export class ProfileService {
     try {
       const response = await apiClient.get<ProfileResponse>('/profile', true);
 
-      if (!response.success) {
+      // Don't log error if user is simply not authenticated
+      if (!response.success && response.error && !response.error.includes("Missing authorization header")) {
         console.error('Failed to get profile:', response.error);
       }
 
       return response;
     } catch (error) {
-      console.error('Error getting profile:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch profile'
+      // Don't log error if user is simply not authenticated
+      if (!errorMessage.includes("Missing authorization header")) {
+        console.error('Error getting profile:', error);
+      }
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to fetch profile',
+        error: errorMessage,
       };
     }
   }
