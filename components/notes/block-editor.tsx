@@ -55,7 +55,7 @@ export function BlockEditor({ block, onUpdate, onDelete, onAddBlockBelow, dragHa
       onUpdate(undefined, items);
     } else {
       if (content !== block.content_md) {
-        // console.log('Saving content:', content);
+        console.log('Saving content:', content);
         onUpdate(content);
       }
     }
