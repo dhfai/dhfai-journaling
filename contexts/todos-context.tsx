@@ -46,9 +46,9 @@ export function TodosProvider({ children }: { children: ReactNode }) {
 
   const createTodo = async (data: CreateTodoRequest): Promise<Todo | null> => {
     try {
-      // console.log('TodosContext: createTodo called with data:', data);
+      console.log('TodosContext: createTodo called with data:', data);
       const response = await TodosService.createTodo(data);
-      // console.log('TodosContext: createTodo response:', response);
+      console.log('TodosContext: createTodo response:', response);
 
       if (!response.success) {
         toast.error(response.error || 'Failed to create todo');

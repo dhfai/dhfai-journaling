@@ -52,7 +52,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           setProfile(response.data.profile);
         } else {
           // If profile fetch fails due to auth error, clear user state but don't force logout
-          // console.log('Profile fetch failed, clearing user state');
+          console.log('Profile fetch failed, clearing user state');
           setUser(null);
           setProfile(null);
         }
@@ -133,7 +133,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       if (!response.success) {
         // Refresh failed - logout immediately
-        // console.log('Token refresh failed, logging out');
+        console.log('Token refresh failed, logging out');
         await logout();
       } else {
         // Reset attempts on successful refresh
