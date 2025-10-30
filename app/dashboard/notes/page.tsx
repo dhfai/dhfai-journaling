@@ -218,7 +218,7 @@ export default function NotesPage() {
   );
 
   return (
-    <div className="flex h-screen bg-background relative overflow-hidden">
+    <div className="flex h-[calc(100vh-var(--header-height))] bg-background relative">
       {/* Notes Sidebar - Fixed dengan scroll area sendiri */}
       <div
         ref={sidebarRef}

@@ -35,20 +35,20 @@ export default function TodosPage() {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('handleCreate called, title:', newTodoTitle);
+    // console.log('handleCreate called, title:', newTodoTitle);
 
     if (!newTodoTitle.trim()) {
-      console.log('Title empty, returning');
+      // console.log('Title empty, returning');
       return;
     }
 
-    console.log('Creating todo...');
+    // console.log('Creating todo...');
     const result = await createTodo({
       title: newTodoTitle.trim(),
       priority: 'medium',
     });
 
-    console.log('Create result:', result);
+    // console.log('Create result:', result);
     if (result) {
       setNewTodoTitle('');
     }
@@ -126,17 +126,17 @@ export default function TodosPage() {
           placeholder="Add a new todo..."
           value={newTodoTitle}
           onChange={(e) => {
-            console.log('Input onChange:', e.target.value);
+            // console.log('Input onChange:', e.target.value);
             setNewTodoTitle(e.target.value);
           }}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
-              console.log('Enter pressed, value:', newTodoTitle);
+              // console.log('Enter pressed, value:', newTodoTitle);
             }
           }}
           className="flex-1"
         />
-        <Button type="submit" onClick={() => console.log('Button clicked, title:', newTodoTitle)}>
+        <Button type="submit" onClick={() => // console.log('Button clicked, title:', newTodoTitle)}>
           Add Todo
         </Button>
       </form>
