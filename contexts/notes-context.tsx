@@ -191,11 +191,11 @@ export function NotesProvider({ children }: NotesProviderProps) {
       if (content !== undefined) updateData.content_md = content;
       if (items !== undefined) updateData.items = items;
 
-      console.log('Updating block:', { noteId, blockId, updateData });
+      // console.log('Updating block:', { noteId, blockId, updateData });
 
       const response = await NotesService.updateBlock(noteId, blockId, updateData);
 
-      console.log('Update block response:', response);
+      // console.log('Update block response:', response);
 
       if (response.success) {
         if (currentNote?.id === noteId) {

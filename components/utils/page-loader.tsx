@@ -22,7 +22,7 @@ export function PageLoader() {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
-          className="fixed inset-0 z-9999 flex items-center justify-center bg-[#4E5173]"
+          className="fixed inset-0 z-9999 flex items-center justify-center bg-background"
         >
           <div className="relative">
             {/* Outer rotating ring */}
@@ -33,7 +33,7 @@ export function PageLoader() {
                 repeat: Infinity,
                 ease: "linear"
               }}
-              className="h-24 w-24 rounded-full border-4 border-white/20 border-t-white"
+              className="h-24 w-24 rounded-full border-4 border-primary/20 border-t-primary"
             />
 
             {/* Inner pulsing circle */}
@@ -44,11 +44,11 @@ export function PageLoader() {
                 repeat: Infinity,
                 ease: "easeInOut"
               }}
-              className="absolute inset-0 m-auto h-16 w-16 rounded-full bg-white/10 backdrop-blur-sm"
+              className="absolute inset-0 m-auto h-16 w-16 rounded-full bg-primary/10 backdrop-blur-sm"
             />
 
             {/* Center dot */}
-            <div className="absolute inset-0 m-auto h-4 w-4 rounded-full bg-white" />
+            <div className="absolute inset-0 m-auto h-4 w-4 rounded-full bg-primary" />
           </div>
 
           {/* Loading text */}
@@ -56,7 +56,7 @@ export function PageLoader() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="absolute mt-40 text-lg font-semibold text-white"
+            className="absolute mt-40 text-lg font-semibold text-foreground"
           >
             Loading...
           </motion.p>
