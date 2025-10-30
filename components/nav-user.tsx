@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/sidebar"
 
 export function NavUser() {
-  const { user, logout } = useAuth()
+  const { user, profile, logout } = useAuth()
   const { isMobile } = useSidebar()
   const router = useRouter()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
@@ -71,8 +71,8 @@ export function NavUser() {
       <SidebarMenu>
         <SidebarMenuItem>
           <SidebarMenuButton size="lg">
-            <Avatar className="h-8 w-8 rounded-lg grayscale">
-              <AvatarFallback className="rounded-lg">...</AvatarFallback>
+            <Avatar className="h-8 w-8 rounded-lg">
+              <AvatarFallback className="rounded-lg bg-muted animate-pulse">...</AvatarFallback>
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-medium">Loading...</span>
@@ -90,6 +90,11 @@ export function NavUser() {
     ? user.username.substring(0, 2).toUpperCase()
     : user.email?.substring(0, 2).toUpperCase() || 'U'
 
+  // Get avatar from profile, fallback to UI Avatars API
+  const userName = profile?.full_name || user.username || user.email || 'User'
+  const fallbackAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=F4D06F&color=2A2D3A&bold=true&size=128&rounded=true`
+  const avatarUrl = profile?.avatar || fallbackAvatarUrl
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -99,8 +104,15 @@ export function NavUser() {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg grayscale">
-                <AvatarFallback className="rounded-lg">{userInitials}</AvatarFallback>
+              <Avatar className="h-8 w-8 rounded-lg">
+                <AvatarImage
+                  src={avatarUrl}
+                  alt={userName}
+                  className="object-cover"
+                />
+                <AvatarFallback className="rounded-lg bg-primary text-primary-foreground">
+                  {userInitials}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.username}</span>

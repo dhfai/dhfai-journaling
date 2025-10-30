@@ -27,8 +27,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { FloatingToolbar } from './floating-toolbar';
-import { formatSelection, getSelectionPosition } from '@/lib/markdown-formatter';
+import { RichTextEditor, RichTextEditorRef } from './rich-text-editor-with-toolbar';
 
 interface BlockEditorProps {
   block: Block;
@@ -42,68 +41,13 @@ export function BlockEditor({ block, onUpdate, onDelete, onAddBlockBelow, dragHa
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState(block.content_md || '');
   const [items, setItems] = useState<TodoItemInBlock[]>(block.items || []);
-  const [toolbarPosition, setToolbarPosition] = useState<{ top: number; left: number } | null>(null);
-  const [isFormatting, setIsFormatting] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  // Auto-resize textarea based on content
-  const adjustTextareaHeight = useCallback(() => {
-    const textarea = textareaRef.current;
-    if (textarea) {
-      // Reset height to auto to get the correct scrollHeight
-      textarea.style.height = 'auto';
-      // Set height to scrollHeight to show all content
-      textarea.style.height = `${textarea.scrollHeight}px`;
-    }
-  }, []);
+  const editorRef = useRef<RichTextEditorRef>(null);
 
   useEffect(() => {
-    if (isEditing && textareaRef.current) {
-      textareaRef.current.focus();
-      textareaRef.current.setSelectionRange(content.length, content.length);
-      adjustTextareaHeight();
+    if (isEditing && editorRef.current) {
+      editorRef.current.focus();
     }
-  }, [isEditing, adjustTextareaHeight]);
-
-  // Adjust height when content changes
-  useEffect(() => {
-    adjustTextareaHeight();
-  }, [content, adjustTextareaHeight]);
-
-  // Handle text selection to show toolbar
-  const handleSelectionChange = () => {
-    if (!textareaRef.current) return;
-
-    const { selectionStart, selectionEnd } = textareaRef.current;
-
-    if (selectionStart !== selectionEnd && isEditing) {
-      const position = getSelectionPosition(textareaRef.current);
-      setToolbarPosition(position);
-    } else {
-      setToolbarPosition(null);
-    }
-  };
-
-  // Handle formatting from toolbar
-  const handleFormat = (syntax: 'bold' | 'italic' | 'underline' | 'strikethrough' | 'code') => {
-    if (!textareaRef.current || isFormatting) return;
-
-    setIsFormatting(true);
-
-    const { selectionStart, selectionEnd } = textareaRef.current;
-    const result = formatSelection(content, selectionStart, selectionEnd, syntax);
-
-    setContent(result.newContent);
-
-    // Update textarea and maintain selection
-    setTimeout(() => {
-      if (textareaRef.current) {
-        textareaRef.current.focus();
-        textareaRef.current.setSelectionRange(result.newSelectionStart, result.newSelectionEnd);
-      }
-      setIsFormatting(false);
-    }, 0);
-  };
+  }, [isEditing]);
 
   const handleBlur = () => {
     setIsEditing(false);
@@ -117,44 +61,8 @@ export function BlockEditor({ block, onUpdate, onDelete, onAddBlockBelow, dragHa
     }
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    // Handle keyboard shortcuts for formatting
-    if ((e.metaKey || e.ctrlKey) && !e.shiftKey) {
-      switch (e.key.toLowerCase()) {
-        case 'b':
-          e.preventDefault();
-          handleFormat('bold');
-          return;
-        case 'i':
-          e.preventDefault();
-          handleFormat('italic');
-          return;
-        case 'u':
-          e.preventDefault();
-          handleFormat('underline');
-          return;
-        case 'e':
-          e.preventDefault();
-          handleFormat('code');
-          return;
-      }
-    }
-
-    // Handle Cmd+Shift+X for strikethrough
-    if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'x') {
-      e.preventDefault();
-      handleFormat('strikethrough');
-      return;
-    }
-
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleBlur();
-      onAddBlockBelow('paragraph');
-    } else if (e.key === 'Escape') {
-      setIsEditing(false);
-      setContent(block.content_md || '');
-    }
+  const handleContentChange = (newContent: string) => {
+    setContent(newContent);
   };
 
   const handleTodoToggle = (itemId: string) => {
@@ -269,29 +177,15 @@ export function BlockEditor({ block, onUpdate, onDelete, onAddBlockBelow, dragHa
         ) : (
           <>
             {isEditing ? (
-              <>
-                <textarea
-                  ref={textareaRef}
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  onSelect={handleSelectionChange}
-                  onBlur={handleBlur}
-                  onKeyDown={handleKeyDown}
-                  placeholder={block.type === 'heading' ? 'Heading' : 'Type something...'}
-                  className={`w-full bg-transparent border-none outline-none resize-none overflow-hidden wrap-break-word whitespace-pre-wrap ${
-                    block.type === 'heading' ? 'text-2xl font-bold' : 'text-base'
-                  }`}
-                  style={{
-                    minHeight: '1.5em',
-                    height: 'auto',
-                    wordWrap: 'break-word'
-                  }}
-                />
-                <FloatingToolbar
-                  position={toolbarPosition}
-                  onFormat={handleFormat}
-                />
-              </>
+              <RichTextEditor
+                ref={editorRef}
+                content={content}
+                onChange={handleContentChange}
+                onBlur={handleBlur}
+                placeholder={block.type === 'heading' ? 'Heading' : 'Type something...'}
+                className={block.type === 'heading' ? 'text-2xl font-bold' : ''}
+                showToolbar={true}
+              />
             ) : (
               <div
                 onClick={() => setIsEditing(true)}
