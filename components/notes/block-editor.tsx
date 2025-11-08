@@ -35,19 +35,30 @@ interface BlockEditorProps {
   onDelete: () => void;
   onAddBlockBelow: (type: Block['type']) => void;
   dragHandleProps?: any;
+  isNew?: boolean;
 }
 
-export function BlockEditor({ block, onUpdate, onDelete, onAddBlockBelow, dragHandleProps }: BlockEditorProps) {
-  const [isEditing, setIsEditing] = useState(false);
+export function BlockEditor({ block, onUpdate, onDelete, onAddBlockBelow, dragHandleProps, isNew = false }: BlockEditorProps) {
+  const [isEditing, setIsEditing] = useState(isNew && block.type !== 'todo');
   const [content, setContent] = useState(block.content_md || '');
   const [items, setItems] = useState<TodoItemInBlock[]>(block.items || []);
+  const [newTodoItemId, setNewTodoItemId] = useState<string | null>(null);
   const editorRef = useRef<RichTextEditorRef>(null);
 
   useEffect(() => {
     if (isEditing && editorRef.current) {
-      editorRef.current.focus();
+      const timer = setTimeout(() => {
+        editorRef.current?.focus();
+      }, 50);
+      return () => clearTimeout(timer);
     }
   }, [isEditing]);
+
+  useEffect(() => {
+    if (isNew && block.type === 'todo' && items.length === 0) {
+      handleAddTodoItem();
+    }
+  }, [isNew, block.type]);
 
   const handleBlur = () => {
     setIsEditing(false);
@@ -92,6 +103,7 @@ export function BlockEditor({ block, onUpdate, onDelete, onAddBlockBelow, dragHa
     };
     const updatedItems = [...items, newItem];
     setItems(updatedItems);
+    setNewTodoItemId(newItem.id);
     onUpdate(undefined, updatedItems);
   };
 
@@ -160,6 +172,8 @@ export function BlockEditor({ block, onUpdate, onDelete, onAddBlockBelow, dragHa
                     onTextChange={(text) => handleTodoTextChange(item.id, text)}
                     onBlur={handleTodoBlur}
                     onDelete={() => handleDeleteTodoItem(item.id)}
+                    isNew={item.id === newTodoItemId}
+                    onClearNew={() => setNewTodoItemId(null)}
                   />
                 ))}
               </SortableContext>
@@ -236,9 +250,12 @@ interface SortableTodoItemProps {
   onTextChange: (text: string) => void;
   onBlur: () => void;
   onDelete: () => void;
+  isNew?: boolean;
+  onClearNew?: () => void;
 }
 
-function SortableTodoItem({ item, onToggle, onTextChange, onBlur, onDelete }: SortableTodoItemProps) {
+function SortableTodoItem({ item, onToggle, onTextChange, onBlur, onDelete, isNew = false, onClearNew }: SortableTodoItemProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
   const {
     attributes,
     listeners,
@@ -247,6 +264,16 @@ function SortableTodoItem({ item, onToggle, onTextChange, onBlur, onDelete }: So
     transition,
     isDragging,
   } = useSortable({ id: item.id });
+
+  // Auto-focus untuk todo item yang baru dibuat
+  useEffect(() => {
+    if (isNew && inputRef.current) {
+      inputRef.current.focus();
+      if (onClearNew) {
+        onClearNew();
+      }
+    }
+  }, [isNew, onClearNew]);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -274,6 +301,7 @@ function SortableTodoItem({ item, onToggle, onTextChange, onBlur, onDelete }: So
       />
 
       <Input
+        ref={inputRef}
         value={item.text}
         onChange={(e) => onTextChange(e.target.value)}
         onBlur={onBlur}

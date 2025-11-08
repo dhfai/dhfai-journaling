@@ -241,8 +241,16 @@
   @apply ml-4 mb-2;
 }
 
+.prose ul {
+  @apply list-disc;
+}
+
+.prose ol {
+  @apply list-decimal;
+}
+
 .prose li {
-  @apply mb-1;
+  @apply mb-1 ml-4;
 }
 
 .prose code {
@@ -263,4 +271,49 @@
 
 .prose em {
   @apply italic;
+}
+
+/* Tiptap Editor specific styles */
+.tiptap-wrapper ul,
+.tiptap-wrapper ol {
+  @apply pl-6 my-2;
+}
+
+.tiptap-wrapper ul {
+  @apply list-disc;
+}
+
+.tiptap-wrapper ol {
+  @apply list-decimal;
+}
+
+.tiptap-wrapper li {
+  @apply mb-1;
+}
+
+.tiptap-wrapper li p {
+  @apply mb-0;
+}
+
+/* Ensure list markers are visible */
+.ProseMirror ul,
+.ProseMirror ol {
+  @apply pl-6 my-2;
+}
+
+.ProseMirror ul {
+  @apply list-disc;
+}
+
+.ProseMirror ol {
+  @apply list-decimal;
+}
+
+.ProseMirror li {
+  @apply mb-1;
+  display: list-item;
+}
+
+.ProseMirror li p {
+  @apply mb-0;
 }

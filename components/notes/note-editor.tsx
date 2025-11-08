@@ -62,17 +62,18 @@ export function NoteEditor({ noteId }: NoteEditorProps) {
   const [isEditingTags, setIsEditingTags] = useState(false);
   const [tagInput, setTagInput] = useState('');
   const [viewMode, setViewMode] = useState<'editor' | 'preview'>('editor');
+  const [newBlockId, setNewBlockId] = useState<string | null>(null); // Track block yang baru dibuat
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8, // Jarak minimal untuk mulai drag (prevent accidental drags)
+        distance: 8,
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 200, // Delay 200ms untuk touch (mencegah scroll)
-        tolerance: 5, // Toleransi gerakan 5px
+        delay: 200,
+        tolerance: 5,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -122,7 +123,13 @@ export function NoteEditor({ noteId }: NoteEditorProps) {
   };
 
   const handleAddBlock = async (type: Block['type']) => {
-    await addBlock(noteId, type);
+    const newBlock = await addBlock(noteId, type);
+    // Set ID block yang baru dibuat untuk auto-focus
+    if (newBlock && newBlock.id) {
+      setNewBlockId(newBlock.id);
+      // Clear flag setelah 500ms untuk memastikan tidak persist
+      setTimeout(() => setNewBlockId(null), 500);
+    }
   };
 
   const handleUpdateBlock = async (blockId: string, content?: string, items?: any[]) => {
@@ -291,6 +298,8 @@ export function NoteEditor({ noteId }: NoteEditorProps) {
                       onUpdate={(content, items) => handleUpdateBlock(block.id, content, items)}
                       onDelete={() => handleDeleteBlock(block.id)}
                       onAddBlockBelow={(type) => handleAddBlock(type)}
+                      isNew={block.id === newBlockId}
+                      onClearNew={() => setNewBlockId(null)}
                     />
                   ))}
                 </div>
@@ -353,9 +362,11 @@ interface SortableBlockProps {
   onUpdate: (content?: string, items?: any[]) => void;
   onDelete: () => void;
   onAddBlockBelow: (type: Block['type']) => void;
+  isNew?: boolean;
+  onClearNew?: () => void;
 }
 
-function SortableBlock({ block, onUpdate, onDelete, onAddBlockBelow }: SortableBlockProps) {
+function SortableBlock({ block, onUpdate, onDelete, onAddBlockBelow, isNew = false, onClearNew }: SortableBlockProps) {
   const {
     attributes,
     listeners,
@@ -377,6 +388,7 @@ function SortableBlock({ block, onUpdate, onDelete, onAddBlockBelow }: SortableB
         onDelete={onDelete}
         onAddBlockBelow={onAddBlockBelow}
         dragHandleProps={listeners}
+        isNew={isNew}
       />
     </div>
   );

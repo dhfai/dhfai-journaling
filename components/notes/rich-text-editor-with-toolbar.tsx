@@ -276,61 +276,66 @@ RichTextEditor.displayName = 'RichTextEditor';
 function markdownToHtml(markdown: string): string {
   if (!markdown) return '';
 
-  let html = markdown;
+  // Split into lines for processing
+  const lines = markdown.split('\n');
+  const result: string[] = [];
+  let inList = false;
+  let listType: 'ul' | 'ol' | null = null;
 
-  // Headers
-  html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
-  html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
-  html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+  for (const line of lines) {
+    const trimmed = line.trim();
 
-  // Bold
-  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    // Ordered list item
+    if (/^\d+\.\s/.test(trimmed)) {
+      if (!inList || listType !== 'ol') {
+        if (inList) result.push(`</${listType}>`);
+        result.push('<ol>');
+        listType = 'ol';
+        inList = true;
+      }
+      const text = trimmed.replace(/^\d+\.\s+/, '');
+      result.push(`<li><p>${text}</p></li>`);
+    }
+    // Unordered list item
+    else if (/^\*\s/.test(trimmed)) {
+      if (!inList || listType !== 'ul') {
+        if (inList) result.push(`</${listType}>`);
+        result.push('<ul>');
+        listType = 'ul';
+        inList = true;
+      }
+      const text = trimmed.replace(/^\*\s+/, '');
+      result.push(`<li><p>${text}</p></li>`);
+    }
+    // Regular line
+    else {
+      if (inList) {
+        result.push(`</${listType}>`);
+        inList = false;
+        listType = null;
+      }
 
-  // Italic
-  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
-  html = html.replace(/_(.+?)_/g, '<em>$1</em>');
+      if (trimmed) {
+        // Headers
+        if (/^###\s/.test(trimmed)) {
+          result.push(`<h3>${trimmed.replace(/^###\s+/, '')}</h3>`);
+        } else if (/^##\s/.test(trimmed)) {
+          result.push(`<h2>${trimmed.replace(/^##\s+/, '')}</h2>`);
+        } else if (/^#\s/.test(trimmed)) {
+          result.push(`<h1>${trimmed.replace(/^#\s+/, '')}</h1>`);
+        } else {
+          result.push(`<p>${trimmed}</p>`);
+        }
+      }
+    }
+  }
 
-  // Underline
-  html = html.replace(/<u>(.+?)<\/u>/g, '<u>$1</u>');
+  // Close any open list
+  if (inList && listType) {
+    result.push(`</${listType}>`);
+  }
 
-  // Strikethrough
-  html = html.replace(/~~(.+?)~~/g, '<s>$1</s>');
-
-  // Code
-  html = html.replace(/`(.+?)`/g, '<code>$1</code>');
-
-  // Links
-  html = html.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>');
-
-  // Unordered lists
-  html = html.replace(/^\* (.+)$/gim, '<li>$1</li>');
-  html = html.replace(/(<li>[\s\S]*<\/li>)/, '<ul>$1</ul>');
-
-  // Ordered lists
-  html = html.replace(/^\d+\. (.+)$/gim, '<li>$1</li>');
-
-  // Task lists
-  html = html.replace(/^- \[ \] (.+)$/gim, '<li data-type="taskItem" data-checked="false">$1</li>');
-  html = html.replace(/^- \[x\] (.+)$/gim, '<li data-type="taskItem" data-checked="true">$1</li>');
-
-  // Blockquotes
-  html = html.replace(/^> (.+)$/gim, '<blockquote>$1</blockquote>');
-
-  // Line breaks
-  html = html.replace(/\n/g, '<br>');
-
-  // Paragraphs
-  html = html.replace(/(<br>)+/g, '</p><p>');
-  html = `<p>${html}</p>`;
-  html = html.replace(/<p><\/p>/g, '');
-  html = html.replace(/<p>(<h[1-3]>)/g, '$1');
-  html = html.replace(/(<\/h[1-3]>)<\/p>/g, '$1');
-  html = html.replace(/<p>(<ul>)/g, '$1');
-  html = html.replace(/(<\/ul>)<\/p>/g, '$1');
-  html = html.replace(/<p>(<blockquote>)/g, '$1');
-  html = html.replace(/(<\/blockquote>)<\/p>/g, '$1');
-
-  return html;
+  return result.join('');
 }
 
 // Helper function to convert HTML back to Markdown for storage
@@ -339,46 +344,60 @@ function htmlToMarkdown(html: string): string {
 
   let markdown = html;
 
-  // Remove empty paragraphs
+  // Remove empty paragraphs first
   markdown = markdown.replace(/<p><\/p>/g, '');
+  markdown = markdown.replace(/<p>\s*<\/p>/g, '');
+
+  // Process lists before other elements
+  // Ordered lists - properly handle nested <p> tags in <li>
+  markdown = markdown.replace(/<ol>([\s\S]*?)<\/ol>/g, (match, listContent) => {
+    let counter = 1;
+    let result = '';
+    // Match <li> with possible nested <p>
+    const items = listContent.match(/<li>[\s\S]*?<\/li>/g) || [];
+    items.forEach((item: string) => {
+      // Extract text, removing nested <p> tags
+      let text = item.replace(/<li>/, '').replace(/<\/li>/, '');
+      text = text.replace(/<p>/g, '').replace(/<\/p>/g, '');
+      text = text.trim();
+      if (text) {
+        result += `${counter++}. ${text}\n`;
+      }
+    });
+    return result;
+  });
+
+  // Unordered lists
+  markdown = markdown.replace(/<ul>([\s\S]*?)<\/ul>/g, (match, listContent) => {
+    let result = '';
+    const items = listContent.match(/<li>[\s\S]*?<\/li>/g) || [];
+    items.forEach((item: string) => {
+      let text = item.replace(/<li>/, '').replace(/<\/li>/, '');
+      text = text.replace(/<p>/g, '').replace(/<\/p>/g, '');
+      text = text.trim();
+      if (text) {
+        result += `* ${text}\n`;
+      }
+    });
+    return result;
+  });
 
   // Headers
   markdown = markdown.replace(/<h1>(.*?)<\/h1>/g, '# $1\n');
   markdown = markdown.replace(/<h2>(.*?)<\/h2>/g, '## $1\n');
   markdown = markdown.replace(/<h3>(.*?)<\/h3>/g, '### $1\n');
 
-  // Bold
+  // Inline formatting (bold, italic, etc)
   markdown = markdown.replace(/<strong>(.*?)<\/strong>/g, '**$1**');
   markdown = markdown.replace(/<b>(.*?)<\/b>/g, '**$1**');
-
-  // Italic
   markdown = markdown.replace(/<em>(.*?)<\/em>/g, '*$1*');
   markdown = markdown.replace(/<i>(.*?)<\/i>/g, '*$1*');
-
-  // Underline
   markdown = markdown.replace(/<u>(.*?)<\/u>/g, '<u>$1</u>');
-
-  // Strikethrough
   markdown = markdown.replace(/<s>(.*?)<\/s>/g, '~~$1~~');
   markdown = markdown.replace(/<strike>(.*?)<\/strike>/g, '~~$1~~');
   markdown = markdown.replace(/<del>(.*?)<\/del>/g, '~~$1~~');
-
-  // Code
   markdown = markdown.replace(/<code>(.*?)<\/code>/g, '`$1`');
-
-  // Links
   markdown = markdown.replace(/<a href="(.*?)">(.*?)<\/a>/g, '[$2]($1)');
-
-  // Task lists
-  markdown = markdown.replace(/<li data-type="taskItem" data-checked="true">(.*?)<\/li>/g, '- [x] $1');
-  markdown = markdown.replace(/<li data-type="taskItem" data-checked="false">(.*?)<\/li>/g, '- [ ] $1');
-
-  // Unordered lists
-  markdown = markdown.replace(/<li>(.*?)<\/li>/g, '* $1\n');
-  markdown = markdown.replace(/<ul>([\s\S]*?)<\/ul>/g, '$1');
-
-  // Ordered lists (simplified)
-  markdown = markdown.replace(/<ol>([\s\S]*?)<\/ol>/g, '$1');
 
   // Blockquotes
   markdown = markdown.replace(/<blockquote>(.*?)<\/blockquote>/g, '> $1\n');
